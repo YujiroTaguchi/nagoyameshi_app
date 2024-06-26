@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Nagoyameshi{% endblock %}
+
+{% block content %}
+<!--メインビジュアル-->
+<section class="container-fluid p-0">
+    <img src="{% static 'images/mainvisual.jpeg' %}" alt="メインビジュアル" class="img-fluid w-100" style="height: 300px; object-fit: cover;">
+</section>
+
+<section class="container mt-4">
+    <h2>レストラン一覧</h2>
+    <ul>
+        {% for restaurant in restaurants %}
+        <li>
+          <a href="#">{{ restaurant.name }}</a>
+          - {{ restaurant.address }}
+        </li>
+        {% endfor %}
+    </ul>
+</section>
+{% endblock %}

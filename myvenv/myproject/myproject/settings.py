@@ -126,3 +126,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #店舗画像関連の設定
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+#静的ファイル（画像含む）の設定
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
