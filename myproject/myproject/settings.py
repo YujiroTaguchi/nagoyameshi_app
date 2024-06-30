@@ -130,5 +130,16 @@ MEDIA_ROOT = BASE_DIR / 'media'
 #静的ファイル（画像含む）の設定
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    BASE_DIR / "static",
+    BASE_DIR / "nagoyameshi/static",
 ]
+
+#カスタムユーザーモデルを指定
+AUTH_USER_MODEL = 'nagoyameshi.CustomUser' 
+
+#ログインの設定
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'login'
+
+#メールエラーへの対処
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

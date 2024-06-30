@@ -1,0 +1,8 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <p>Hi {{ user.full_name }},</p>
+    <p>Please click on the link below to confirm your email address and complete the registration process:</p>
+    <a href="http://{{ domain }}{% url 'activate' uid=uid token=token %}">Activate your account</a>
+</body>
+</html>

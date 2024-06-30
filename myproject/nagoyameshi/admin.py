@@ -1,13 +1,52 @@
 from django.contrib import admin
-from .models import Restaurant #レストラン登録のためのモデルインポート
+from django.contrib.auth.admin import UserAdmin
+from .models import Restaurant, CustomUser, Category, Review  # レストラン登録、サインアップ等各モデルインポート
+from django.utils.safestring import mark_safe
 
-
-#画面登録
+# レストラン登録
 class RestaurantAdmin(admin.ModelAdmin):
-     list_display = ('id', 'name', 'price','img')
-     search_fields = ('name',)
+    list_display = ('id', 'name', 'price', 'img_display')  # img_displayを追加
+    search_fields = ('name', )  # categoryでの検索を追加
 
-     def image(self, obj):
-         return mark_safe('<img src="{}" style="width:100px height:auto;">'.format(obj.img.url))
+    def img_display(self, obj):
+        if obj.img:
+            return mark_safe('<img src="{}" style="width:100px; height:auto;">'.format(obj.img.url))
+        return ""
+    img_display.short_description = 'Image'  # 管理画面での列名を設定
 
-admin.site.register(Restaurant,RestaurantAdmin) 
+# カスタムユーザーモデルの管理画面登録
+class CustomUserAdmin(UserAdmin):
+    list_display = ('email', 'full_name', 'is_active', 'is_end_user', 'is_admin_user')
+    search_fields = ('email', 'full_name')
+    readonly_fields = ('date_joined', 'last_login')
+
+    fieldsets = (
+        (None, {'fields': ('email', 'password')}),
+        ('Personal info', {'fields': ('full_name', 'furigana', 'postal_code', 'address', 'phone_number', 'birthdate', 'occupation')}),
+        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
+        ('Important dates', {'fields': ('last_login', 'date_joined')}),
+    )
+
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('email', 'full_name', 'furigana', 'postal_code', 'address', 'phone_number', 'birthdate', 'occupation', 'password1', 'password2'),
+        }),
+    )
+
+    ordering = ('email',)
+
+# カテゴリーの管理
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name')
+    search_fields = ('name',)
+
+# レビューの管理
+class ReviewAdmin(admin.ModelAdmin):
+    list_display = ('id', 'restaurant', 'user', 'rating', 'comment', 'created_at')
+    search_fields = ('restaurant__name', 'user__email', 'rating')
+
+admin.site.register(Restaurant, RestaurantAdmin)
+admin.site.register(Category, CategoryAdmin)
+admin.site.register(Review, ReviewAdmin)
+admin.site.register(CustomUser, CustomUserAdmin)

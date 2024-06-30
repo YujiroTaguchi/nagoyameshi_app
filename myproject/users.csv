@@ -1,0 +1,4 @@
+id,password,last_login,is_superuser,first_name,last_name,is_staff,is_active,date_joined,email,full_name,furigana,postal_code,address,phone_number,birthdate,occupation,is_end_user,is_admin_user
+1,pbkdf2_sha256$720000$z4tQ8jWZGRZH2CcM6LylNL$jtrTFz3e9089iWjVUSoRsQ7qPhGA6rVl2ipJyBomfRA=,,True,,,True,True,2024-06-29 02:50:39.601061+00:00,admin@exampl.com,admin,admin,100,100,100,1282-08-16,kaishain,False,False
+2,pbkdf2_sha256$720000$0ENSgj76qQzjy3Dqq2h6pu$j8F6X9vlgo1n6svy/BNKOaZM+jBs043Iz6xRNhhLIj4=,2024-06-30 01:20:59.113735+00:00,True,,,True,True,2024-06-29 04:15:40.582799+00:00,admin@example.com,admin,admin,100,100,100,1982-08-16,100,False,False
+3,pbkdf2_sha256$720000$9C9IVzWJ2MQOQEZ9YJ6vpA$/VcZGbnQgxWxCQa7lZewuEFdB2U4jTy5H9+uHEb3gAU=,2024-06-30 00:58:50.472899+00:00,False,,,False,True,2024-06-30 00:37:36.732931+00:00,tarotanaka@example.com,田中太郎,タナカタロウ,460-0006,愛知県名古屋市中区東桜6丁目6-6,052-666-6666,1982-08-16,会社員,False,False
