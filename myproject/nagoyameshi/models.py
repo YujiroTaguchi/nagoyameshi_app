@@ -61,6 +61,7 @@ class CustomUser(AbstractUser):#フィールドとメソッド（PW検証など�
 
     is_end_user = models.BooleanField(default=False)#カスタムでエンドユーザーかどうかのフラグを追加
     is_admin_user = models.BooleanField(default=False)#管理者かどうかのフラグを追加
+    is_subscription_user = models.BooleanField(default=False)  # 有料会員かどうかのフラグを追加
 
     USERNAME_FIELD = 'email'  # メールアドレスを認証に使用
     REQUIRED_FIELDS = ['full_name', 'furigana', 'postal_code', 'address', 'phone_number', 'birthdate', 'occupation']
@@ -91,3 +92,22 @@ class Reservation(models.Model):
 
     def __str__(self):
         return f'{self.user.full_name} - {self.restaurant.name} - {self.reservation_date} {self.reservation_time}'
+    
+    # お気に入りモデルの定義
+class Favorite(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.user.full_name} likes {self.restaurant.name}'
+    
+# 有料会員登録モデルの定義
+class Subscription(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    stripe_customer_id = models.CharField(max_length=255)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'{self.user.email} - {"Active" if self.is_active else "Inactive"}'

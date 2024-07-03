@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}お気に入りリスト{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>お気に入りリスト</h2>
+    <ul>
+        {% for favorite in favorites %}
+        <li>
+            <a href="{% url 'restaurant_detail' favorite.restaurant.id %}">{{ favorite.restaurant.name }}</a>
+            <form method="post" action="{% url 'remove_from_favorites' favorite.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-sm">お気に入り解除</button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

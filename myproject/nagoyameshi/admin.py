@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import Restaurant, CustomUser, Category, Review  # レストラン登録、サインアップ等各モデルインポート
+from .models import Restaurant, CustomUser, Category, Review, Reservation, Favorite  # レストラン登録、サインアップ等各モデルインポート
 from django.utils.safestring import mark_safe
 
 # レストラン登録
@@ -46,7 +46,22 @@ class ReviewAdmin(admin.ModelAdmin):
     list_display = ('id', 'restaurant', 'user', 'rating', 'comment', 'created_at')
     search_fields = ('restaurant__name', 'user__email', 'rating')
 
+
+# 予約の管理
+class ReservationAdmin(admin.ModelAdmin):
+    list_display = ('id', 'restaurant', 'user', 'reservation_date', 'reservation_time', 'number_of_people')
+    search_fields = ('restaurant__name', 'user__email', 'reservation_date', 'reservation_time')
+
+# お気に入りの管理
+class FavoriteAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'restaurant')
+    search_fields = ('user__email', 'restaurant__name')
+
+
 admin.site.register(Restaurant, RestaurantAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Review, ReviewAdmin)
 admin.site.register(CustomUser, CustomUserAdmin)
+admin.site.register(Reservation, ReservationAdmin)  # ReservationAdminを登録
+admin.site.register(Favorite, FavoriteAdmin)
+

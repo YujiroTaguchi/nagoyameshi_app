@@ -1,16 +1,40 @@
 {% extends 'base.html' %}
 
+{% block title %}{{ restaurant.name }}{% endblock %}
+
 {% block content %}
-<h2>予約リスト</h2>
-<ul>
-    {% for reservation in reservations %}
-    <li>
-        {{ reservation.restaurant.name }} - {{ reservation.reservation_date }} {{ reservation.reservation_time }} - {{ reservation.number_of_people }}人
-        <form method="post" action="{% url 'cancel_reservation' reservation.id %}">
+<div class="container mt-4">
+    <h2>{{ restaurant.name }}</h2>
+    <img src="{{ restaurant.img.url }}" class="img-fluid mb-4" alt="{{ restaurant.name }}">
+    <p>{{ restaurant.description }}</p>
+    <p>住所: {{ restaurant.address }}</p>
+    <p>電話番号: {{ restaurant.phone_number }}</p>
+    <p>営業時間: {{ restaurant.open_time }} - {{ restaurant.close_time }}</p>
+    
+    <div class="d-flex justify-content-start mb-4">
+        <!-- 予約ボタン -->
+        <form method="post" action="{% url 'make_reservation' restaurant.id %}" class="me-2 d-inline">
             {% csrf_token %}
-            <button type="submit">キャンセル</button>
+            <input type="date" name="reservation_date" required>
+            <input type="time" name="reservation_time" required>
+            <input type="number" name="number_of_people" min="1" required>
+            <button type="submit" class="btn btn-primary">予約</button>
         </form>
-    </li>
-    {% endfor %}
-</ul>
+
+        <!-- お気に入りボタン -->
+        <form method="post" action="{% url 'add_to_favorites' restaurant.id %}" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-warning">お気に入りに追加</button>
+        </form>
+    </div>
+    
+    <h3>レビュー</h3>
+    <ul>
+        {% for review in reviews %}
+        <li>
+            <strong>{{ review.user.full_name }}</strong>: {{ review.comment }} (Rating: {{ review.rating }})
+        </li>
+        {% endfor %}
+    </ul>
+</div>
 {% endblock %}

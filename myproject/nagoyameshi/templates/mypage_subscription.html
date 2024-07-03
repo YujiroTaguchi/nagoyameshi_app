@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>マイページ（有料会員）</h2>
+<p>ようこそ、{{ user.full_name }}さん</p>
+<a href="{% url 'edit_profile' %}">プロフィール編集</a>
+
+<h3>予約一覧</h3>
+<ul>
+    {% for reservation in reservations %}
+    <li>{{ reservation.restaurant.name }} - {{ reservation.reservation_date }} {{ reservation.reservation_time }} - {{ reservation.number_of_people }}人
+        <form method="post" action="{% url 'cancel_reservation' reservation.id %}">
+            {% csrf_token %}
+            <button type="submit">キャンセル</button>
+        </form>
+    </li>
+    {% endfor %}
+</ul>
+
+<h3>お気に入り一覧</h3>
+<ul>
+    {% for favorite in favorites %}
+    <li>{{ favorite.restaurant.name }}
+        <form method="post" action="{% url 'remove_from_favorites' favorite.id %}">
+            {% csrf_token %}
+            <button type="submit">解除</button>
+        </form>
+    </li>
+    {% endfor %}
+</ul>
+
+<a href="{% url 'logout' %}">ログアウト</a>
+{% endblock %}
+
