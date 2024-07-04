@@ -17,6 +17,7 @@ from django.contrib.auth.decorators import login_required
 from datetime import datetime
 import stripe
 from django.conf import settings
+from django.urls import reverse
 
 # StripeのAPIキーを設定
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -96,6 +97,10 @@ def signup(request):
             'uid': urlsafe_base64_encode(force_bytes(user.pk)),
             'token': default_token_generator.make_token(user),
         })
+        activation_url = reverse('activate', kwargs={
+            'uidb64': urlsafe_base64_encode(force_bytes(user.pk)),
+            'token': default_token_generator.make_token(user)
+        })
         send_mail(mail_subject, message, 'noreply@mydomain.com', [email])
 
         return HttpResponse('Please confirm your email address to complete the registration.')
@@ -137,7 +142,7 @@ def login_view(request):
 @login_required
 @csrf_protect
 def make_reservation(request, restaurant_id):
-    restaurant = Restaurant.objects.get(pk=restaurant_id)
+    restaurant = get_object_or_404(Restaurant, pk=restaurant_id)
     if request.method == 'POST':
         reservation_date = request.POST['reservation_date']
         reservation_time = request.POST['reservation_time']
@@ -164,9 +169,15 @@ def make_reservation(request, restaurant_id):
         })
         send_mail(mail_subject, message, 'noreply@mydomain.com', [request.user.email])
 
-        return redirect('reservation_list')
+        return redirect('reservation_success', reservation_id=reservation.id)
 
     return render(request, 'make_reservation.html', {'restaurant': restaurant})
+
+@login_required
+def reservation_success(request, reservation_id):
+    reservation = get_object_or_404(Reservation, pk=reservation_id)
+    return render(request, 'reservation_success.html', {'reservation': reservation})
+
 
 # 予約リストビュー
 @login_required
@@ -233,30 +244,28 @@ def edit_profile(request):
 # StripeのCheckoutセッション作成ビュー
 class CreateCheckoutSessionView(View):
     def post(self, request, *args, **kwargs):
-        print("====")
         YOUR_DOMAIN = "http://127.0.0.1:8000"
-        checkout_session = stripe.checkout.Session.create(
-            payment_method_types=['card'],
-            line_items=[
-                {
-                    'price_data': {
-                        'currency': 'jpy',
-                        'product_data': {
-                            'name': 'Subscription',
-                        },
-                        'unit_amount': 5000,
+        try:
+            checkout_session = stripe.checkout.Session.create(
+                payment_method_types=['card'],
+                line_items=[
+                    {
+                        'price': 'price_1PYjlTRw1PAgyvNA5zi02qT7',  # 実際の価格IDに置き換えます
+                        'quantity': 1,
                     },
-                    'quantity': 1,
-                },
-            ],
-            mode='subscription',
-            success_url=YOUR_DOMAIN + '/success/',
-            cancel_url=YOUR_DOMAIN + '/cancel/',
-        )
-        return JsonResponse({
-            'id': checkout_session.id
-        })
+                ],
+                mode='subscription',
+                success_url=YOUR_DOMAIN + '/success/',
+                cancel_url=YOUR_DOMAIN + '/cancel/',
+            )
+            return JsonResponse({
+                'id': checkout_session.id
+            })
+        except Exception as e:
+            print('Error creating checkout session:', e)
+            return JsonResponse({'error': str(e)}, status=500)
 
+    
 # Stripe支払い成功時のビュー
 class SuccessView(View):
     def get(self, request, *args, **kwargs):

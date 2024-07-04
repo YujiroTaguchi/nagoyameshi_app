@@ -21,7 +21,8 @@ from nagoyameshi.views import (
     edit_profile,
     CreateCheckoutSessionView,
     SuccessView,
-    CancelView
+    CancelView,
+    reservation_success
 )
 
 urlpatterns = [
@@ -43,6 +44,7 @@ urlpatterns = [
     path('create-checkout-session/', CreateCheckoutSessionView.as_view(), name='create-checkout-session'),
     path('success/', SuccessView.as_view(), name='success'),
     path('cancel/', CancelView.as_view(), name='cancel'),
+    path('reservation_success/<int:reservation_id>/', reservation_success, name='reservation_success'),
 ]
 
 if settings.DEBUG:

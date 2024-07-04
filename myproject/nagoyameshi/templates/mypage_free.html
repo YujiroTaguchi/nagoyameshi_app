@@ -9,9 +9,9 @@
         <!-- 会員情報編集ボタン -->
         <a href="{% url 'edit_profile' %}" class="list-group-item list-group-item-action">会員情報編集</a>
         <!-- 有料会員登録ボタン -->
-        <form id="checkout-form" action="{% url 'create-checkout-session' %}" method="POST" class="list-group-item">
+        <form id="checkout-form" method="POST" action="{% url 'create-checkout-session' %}" class="list-group-item">
             {% csrf_token %}
-            <button type="button" id="checkout-button" class="btn btn-primary">有料会員登録</button>
+            <button type="submit" id="checkout-button" name="checkout-button" class="btn btn-primary">有料会員登録</button>
         </form>
         <!-- ログアウトボタン -->
         <a href="{% url 'logout' %}" class="list-group-item list-group-item-action">ログアウト</a>
@@ -23,20 +23,13 @@
 <script src="https://js.stripe.com/v3/"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM fully loaded and parsed');
     var stripe = Stripe('{{ stripe_public_key }}');
-    console.log('Stripe initialized');
 
-    var checkoutButton = document.getElementById('checkout-button');
-    if (checkoutButton) {
-        console.log('Checkout button found');
-    } else {
-        console.error('Checkout button not found');
-    }
+    var checkoutForm = document.getElementById('checkout-form');
 
-    checkoutButton.addEventListener('click', function(e) {
+    checkoutForm.addEventListener('submit', function(e) {
         e.preventDefault();
-        console.log('Checkout button clicked');
+        console.log('Checkout form submitted');  // クリックイベントが発生したことを確認
         fetch('{% url "create-checkout-session" %}', {
             method: 'POST',
             headers: {
@@ -45,21 +38,24 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .then(function(response) {
-            console.log('Response received', response);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            console.log('Fetch response received');  // フェッチリクエストが成功したことを確認
             return response.json();
         })
         .then(function(session) {
-            console.log('Session received', session);
+            console.log('Session:', session);  // セッション情報をログ出力
             return stripe.redirectToCheckout({ sessionId: session.id });
         })
         .then(function(result) {
             if (result.error) {
-                console.error('Stripe error', result.error.message);
                 alert(result.error.message);
             }
         })
         .catch(function(error) {
             console.error('Error:', error);
+            alert('There was an error processing your request. Please try again.');
         });
     });
 });

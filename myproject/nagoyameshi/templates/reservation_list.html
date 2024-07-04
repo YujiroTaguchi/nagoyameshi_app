@@ -1,40 +1,33 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ restaurant.name }}{% endblock %}
+{% block title %}予約一覧{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <h2>{{ restaurant.name }}</h2>
-    <img src="{{ restaurant.img.url }}" class="img-fluid mb-4" alt="{{ restaurant.name }}">
-    <p>{{ restaurant.description }}</p>
-    <p>住所: {{ restaurant.address }}</p>
-    <p>電話番号: {{ restaurant.phone_number }}</p>
-    <p>営業時間: {{ restaurant.open_time }} - {{ restaurant.close_time }}</p>
-    
-    <div class="d-flex justify-content-start mb-4">
-        <!-- 予約ボタン -->
-        <form method="post" action="{% url 'make_reservation' restaurant.id %}" class="me-2 d-inline">
-            {% csrf_token %}
-            <input type="date" name="reservation_date" required>
-            <input type="time" name="reservation_time" required>
-            <input type="number" name="number_of_people" min="1" required>
-            <button type="submit" class="btn btn-primary">予約</button>
-        </form>
-
-        <!-- お気に入りボタン -->
-        <form method="post" action="{% url 'add_to_favorites' restaurant.id %}" class="d-inline">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-warning">お気に入りに追加</button>
-        </form>
-    </div>
-    
-    <h3>レビュー</h3>
-    <ul>
-        {% for review in reviews %}
-        <li>
-            <strong>{{ review.user.full_name }}</strong>: {{ review.comment }} (Rating: {{ review.rating }})
-        </li>
-        {% endfor %}
-    </ul>
+    <h2>予約一覧</h2>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>レストラン名</th>
+                <th>予約日</th>
+                <th>予約時間</th>
+                <th>人数</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reservation in reservations %}
+            <tr>
+                <td>{{ reservation.restaurant.name }}</td>
+                <td>{{ reservation.reservation_date }}</td>
+                <td>{{ reservation.reservation_time }}</td>
+                <td>{{ reservation.number_of_people }}</td>
+                <td>
+                    <a href="{% url 'cancel_reservation' reservation.id %}" class="btn btn-danger btn-sm">キャンセル</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endblock %}

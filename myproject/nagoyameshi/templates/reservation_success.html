@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}予約完了{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>予約完了</h2>
+    <div class="alert alert-success" role="alert">
+        予約が完了しました！
+    </div>
+    <p>店名: {{ reservation.restaurant.name }}</p>
+    <p>予約日: {{ reservation.reservation_date }}</p>
+    <p>予約時間: {{ reservation.reservation_time }}</p>
+    <p>人数: {{ reservation.number_of_people }}</p>
+    <a href="{% url 'restaurant_detail' reservation.restaurant.id %}" class="btn btn-primary mt-4">戻る</a>
+</div>
+{% endblock %}

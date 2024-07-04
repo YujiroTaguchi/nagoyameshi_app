@@ -19,9 +19,9 @@
         </li>
         {% endfor %}
     </ul>
-    <a href="{% if user.is_authenticated %}{% url 'make_reservation' restaurant.id %}{% else %}{% url 'login' %}{% endif %}" class="btn btn-primary mt-4">予約する</a> <!-- 予約ボタン設置-->
+    <a href="{% if request.user.is_authenticated %}{% url 'make_reservation' restaurant.id %}{% else %}{% url 'login' %}{% endif %}" class="btn btn-primary mt-4">予約する</a> <!-- 予約ボタン設置-->
 
-    {% if user.is_authenticated %}
+    {% if request.user.is_authenticated %}
     <form method="post" action="{% url 'add_to_favorites' restaurant.id %}">
         {% csrf_token %}
         <button type="submit" class="btn btn-primary">お気に入り追加</button>
