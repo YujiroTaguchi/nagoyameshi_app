@@ -23,41 +23,47 @@
 <script src="https://js.stripe.com/v3/"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM fully loaded and parsed');  // DOMが完全に読み込まれたことを確認
     var stripe = Stripe('{{ stripe_public_key }}');
 
     var checkoutForm = document.getElementById('checkout-form');
+    console.log('Checkout form:', checkoutForm);  // フォームが正しく取得されていることを確認
 
-    checkoutForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        console.log('Checkout form submitted');  // クリックイベントが発生したことを確認
-        fetch('{% url "create-checkout-session" %}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
-            }
-        })
-        .then(function(response) {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            console.log('Fetch response received');  // フェッチリクエストが成功したことを確認
-            return response.json();
-        })
-        .then(function(session) {
-            console.log('Session:', session);  // セッション情報をログ出力
-            return stripe.redirectToCheckout({ sessionId: session.id });
-        })
-        .then(function(result) {
-            if (result.error) {
-                alert(result.error.message);
-            }
-        })
-        .catch(function(error) {
-            console.error('Error:', error);
-            alert('There was an error processing your request. Please try again.');
+    if (checkoutForm) {
+        checkoutForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log('Checkout form submitted');  // クリックイベントが発生したことを確認
+            fetch('{% url "create-checkout-session" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                console.log('Fetch response received');  // フェッチリクエストが成功したことを確認
+                return response.json();
+            })
+            .then(function(session) {
+                console.log('Session:', session);  // セッション情報をログ出力
+                if (session.url) {
+                    console.log('Redirecting to:', session.url);  // リダイレクトURLをログに出力
+                    window.location.href = session.url;  // URLが存在する場合はリダイレクト
+                } else {
+                    console.error('No URL in session:', session);
+                }
+            })
+            .catch(function(error) {
+                console.error('Error:', error);
+                alert('There was an error processing your request. Please try again.');
+            });
         });
-    });
+    } else {
+        console.error('Checkout form not found');
+    }
 });
 </script>
 {% endblock %}

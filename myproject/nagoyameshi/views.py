@@ -259,7 +259,8 @@ class CreateCheckoutSessionView(View):
                 cancel_url=YOUR_DOMAIN + '/cancel/',
             )
             return JsonResponse({
-                'id': checkout_session.id
+                'id': checkout_session.id,
+                'url': checkout_session.url  # URLを含めて返す
             })
         except Exception as e:
             print('Error creating checkout session:', e)
