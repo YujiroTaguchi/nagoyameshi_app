@@ -59,6 +59,9 @@ class CustomUser(AbstractUser):#フィールドとメソッド（PW検証など�
     birthdate = models.DateField(null=True, blank=True)
     occupation = models.CharField(max_length=100)
 
+    stripe_customer_id = models.CharField(max_length=255, null=True, blank=True)#ストライプAPI
+    stripe_subscription_id = models.CharField(max_length=255, null=True, blank=True)#ストライプAPI
+
     is_end_user = models.BooleanField(default=False)#カスタムでエンドユーザーかどうかのフラグを追加
     is_admin_user = models.BooleanField(default=False)#管理者かどうかのフラグを追加
     is_subscription_user = models.BooleanField(default=False)  # 有料会員かどうかのフラグを追加
@@ -105,6 +108,7 @@ class Favorite(models.Model):
 class Subscription(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     stripe_customer_id = models.CharField(max_length=255)
+    stripe_subscription_id = models.CharField(max_length=255, null=True, blank=True)  # StripeのサブスクリプションID
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

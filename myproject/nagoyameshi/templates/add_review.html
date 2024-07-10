@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}レビューを追加{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ restaurant.name }}にレビューを追加</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="rating">評価:</label>
+            <select id="rating" name="rating" class="form-control" required>
+                <option value="">選択してください</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="comment">コメント:</label>
+            <textarea id="comment" name="comment" class="form-control" rows="5" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary mt-2">送信</button>
+    </form>
+</div>
+{% endblock %}

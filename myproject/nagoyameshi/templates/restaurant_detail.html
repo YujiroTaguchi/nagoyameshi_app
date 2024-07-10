@@ -4,6 +4,14 @@
 
 {% block content %}
 <div class="container mt-4">
+    <!-- パンくずリスト -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'restaurant_list' %}">戻る</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ restaurant.name }}</li>
+        </ol>
+    </nav>
+
     <h2>{{ restaurant.name }}</h2>
     <img src="{{ restaurant.img.url }}" class="img-fluid mb-4" alt="{{ restaurant.name }}">
     <p>{{ restaurant.description }}</p>
@@ -12,22 +20,41 @@
     <p>営業時間: {{ restaurant.open_time }} - {{ restaurant.close_time }}</p>
     
     <h3>レビュー</h3>
+    <div>
+        {% if avg_rating %}
+        <p>平均評価: {{ avg_rating }}</p>
+        {% endif %}
+    </div>
     <ul>
         {% for review in reviews %}
         <li>
-            <strong>{{ review.user.full_name }}</strong>: {{ review.comment }} (Rating: {{ review.rating }})
+            <strong>{{ review.user.full_name }}</strong>: {{ review.comment }} (評価: {{ review.rating }})
+            {% if request.user == review.user %}
+            <!-- 編集と削除ボタン -->
+            <div>
+                <a href="{% url 'edit_review' review.id %}" class="btn btn-secondary btn-sm">編集</a>
+                <form action="{% url 'delete_review' review.id %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm">削除</button>
+                </form>
+            </div>
+            {% endif %}
         </li>
         {% endfor %}
     </ul>
-    <a href="{% if request.user.is_authenticated %}{% url 'make_reservation' restaurant.id %}{% else %}{% url 'login' %}{% endif %}" class="btn btn-primary mt-4">予約する</a> <!-- 予約ボタン設置-->
 
-    {% if request.user.is_authenticated %}
-    <form method="post" action="{% url 'add_to_favorites' restaurant.id %}">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-primary">お気に入り追加</button>
-    </form>
-{% else %}
-    <p>お気に入り機能を利用するには<a href="{% url 'login' %}">ログイン</a>してください。</p>
-{% endif %}
+    <div class="d-flex gap-2 mt-4">
+        <a href="{% if request.user.is_authenticated %}{% url 'make_reservation' restaurant.id %}{% else %}{% url 'login' %}{% endif %}" class="btn btn-primary">予約する</a>
+        
+        {% if request.user.is_authenticated %}
+        <form method="post" action="{% url 'add_to_favorites' restaurant.id %}" class="mb-0">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">お気に入り追加</button>
+        </form>
+        <a href="{% url 'add_review' restaurant.id %}" class="btn btn-primary">レビューを投稿する</a>
+        {% else %}
+        <p>お気に入り機能を利用するには<a href="{% url 'login' %}">ログイン</a>してください。</p>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}

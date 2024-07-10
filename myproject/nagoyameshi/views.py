@@ -18,6 +18,7 @@ from datetime import datetime
 import stripe
 from django.conf import settings
 from django.urls import reverse
+from django.db.models import Avg 
 
 # StripeのAPIキーを設定
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -41,6 +42,9 @@ class RestaurantListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['categories'] = Category.objects.all()
+        for restaurant in context['restaurants']:
+            avg_rating = Review.objects.filter(restaurant=restaurant).aggregate(Avg('rating'))['rating__avg']
+            restaurant.avg_rating = round(avg_rating, 2) if avg_rating else None
         return context
 
 # レストラン詳細ビュー
@@ -52,8 +56,10 @@ class RestaurantDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['reviews'] = Review.objects.filter(restaurant=self.object)
+        avg_rating = Review.objects.filter(restaurant=self.object).aggregate(Avg('rating'))['rating__avg']
+        context['avg_rating'] = round(avg_rating, 2) if avg_rating else None
         return context
-
+    
 # 新規会員登録用のビュー
 @csrf_protect
 def signup(request):
@@ -258,14 +264,11 @@ class CreateCheckoutSessionView(View):
                 success_url=YOUR_DOMAIN + '/success/',
                 cancel_url=YOUR_DOMAIN + '/cancel/',
             )
-            return JsonResponse({
-                'id': checkout_session.id,
-                'url': checkout_session.url  # URLを含めて返す
-            })
+            return redirect(checkout_session.url)
         except Exception as e:
             print('Error creating checkout session:', e)
             return JsonResponse({'error': str(e)}, status=500)
-
+        
     
 # Stripe支払い成功時のビュー
 class SuccessView(View):
@@ -284,3 +287,52 @@ class CancelView(View):
 def logout_view(request):
     logout(request)
     return redirect('login')
+
+# 解約機能の追加
+@login_required
+def cancel_subscription(request):
+    user = request.user
+    try:
+        # サブスクリプションIDを取得する（例: ユーザーモデルに保存されている場合）
+        subscription_id = user.stripe_subscription_id
+        stripe.Subscription.delete(subscription_id)
+        
+        # ユーザーモデルのサブスクリプションステータスを更新
+        user.is_subscription_user = False
+        user.stripe_subscription_id = None
+        user.save()
+        
+        return redirect('mypage')
+    except Exception as e:
+        print(f"Error cancelling subscription: {e}")
+        return HttpResponse("Error cancelling subscription. Please try again later.")
+    
+   # レビュー投稿ビュー
+@login_required
+def add_review(request, restaurant_id):
+    restaurant = get_object_or_404(Restaurant, id=restaurant_id)
+    if request.method == 'POST':
+        rating = request.POST['rating']
+        comment = request.POST['comment']
+        Review.objects.create(user=request.user, restaurant=restaurant, rating=rating, comment=comment)
+        return redirect('restaurant_detail', pk=restaurant.id)
+    return render(request, 'add_review.html', {'restaurant': restaurant})
+
+# レビュ編集ュー
+@login_required
+def edit_review(request, review_id):
+    review = get_object_or_404(Review, id=review_id, user=request.user)
+    if request.method == 'POST':
+        review.rating = request.POST['rating']
+        review.comment = request.POST['comment']
+        review.save()
+        return redirect('restaurant_detail', pk=review.restaurant.id)
+    return render(request, 'edit_review.html', {'review': review})
+
+# レビュー削除ビュー
+@login_required
+def delete_review(request, review_id):
+    review = get_object_or_404(Review, id=review_id, user=request.user)
+    restaurant_id = review.restaurant.id
+    review.delete()
+    return redirect('restaurant_detail', pk=restaurant_id)

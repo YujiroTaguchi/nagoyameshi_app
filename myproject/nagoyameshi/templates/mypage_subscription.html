@@ -1,34 +1,71 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>マイページ（有料会員）</h2>
-<p>ようこそ、{{ user.full_name }}さん</p>
-<a href="{% url 'edit_profile' %}">プロフィール編集</a>
+<div class="container mt-4">
+    <h2>マイページ（有料会員）</h2>
+    <div class="d-flex align-items-center mb-4">
+        <p class="mb-0">ようこそ、{{ user.full_name }}さん</p>
+        <a href="{% url 'edit_profile' %}" class="ms-3 text-primary">プロフィール編集</a>
+    </div>
 
-<h3>予約一覧</h3>
-<ul>
-    {% for reservation in reservations %}
-    <li>{{ reservation.restaurant.name }} - {{ reservation.reservation_date }} {{ reservation.reservation_time }} - {{ reservation.number_of_people }}人
-        <form method="post" action="{% url 'cancel_reservation' reservation.id %}">
-            {% csrf_token %}
-            <button type="submit">キャンセル</button>
-        </form>
-    </li>
-    {% endfor %}
-</ul>
+    <h3 class="mt-4">予約一覧</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>レストラン</th>
+                <th>予約日</th>
+                <th>予約時間</th>
+                <th>人数</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reservation in reservations %}
+            <tr>
+                <td><a href="{% url 'restaurant_detail' reservation.restaurant.id %}">{{ reservation.restaurant.name }}</a></td>
+                <td>{{ reservation.reservation_date }}</td>
+                <td>{{ reservation.reservation_time }}</td>
+                <td>{{ reservation.number_of_people }}人</td>
+                <td>
+                    <form method="post" action="{% url 'cancel_reservation' reservation.id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm">キャンセル</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
-<h3>お気に入り一覧</h3>
-<ul>
-    {% for favorite in favorites %}
-    <li>{{ favorite.restaurant.name }}
-        <form method="post" action="{% url 'remove_from_favorites' favorite.id %}">
-            {% csrf_token %}
-            <button type="submit">解除</button>
-        </form>
-    </li>
-    {% endfor %}
-</ul>
+    <h3 class="mt-4">お気に入り一覧</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>レストラン</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for favorite in favorites %}
+            <tr>
+                <td><a href="{% url 'restaurant_detail' favorite.restaurant.id %}">{{ favorite.restaurant.name }}</a></td>
+                <td>
+                    <form method="post" action="{% url 'remove_from_favorites' favorite.id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm">解除</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
-<a href="{% url 'logout' %}">ログアウト</a>
+    <!-- 有料会員解約ボタン -->
+    <form id="cancel-subscription-form" method="POST" action="{% url 'cancel_subscription' %}" class="mt-4">
+        {% csrf_token %}
+        <button type="submit" id="cancel-subscription-button" name="cancel-subscription-button" class="btn btn-secondary">有料会員解約</button>
+    </form>
+
+    <a href="{% url 'logout' %}" class="btn btn-secondary mt-4">ログアウト</a>
+</div>
 {% endblock %}
-

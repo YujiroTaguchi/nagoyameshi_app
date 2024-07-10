@@ -4,6 +4,7 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth.views import LogoutView
+from django.contrib.auth import views as auth_views
 
 from nagoyameshi.views import (
     signup,
@@ -22,7 +23,9 @@ from nagoyameshi.views import (
     CreateCheckoutSessionView,
     SuccessView,
     CancelView,
-    reservation_success
+    reservation_success,
+    cancel_subscription,
+    add_review, edit_review, delete_review,
 )
 
 urlpatterns = [
@@ -45,6 +48,14 @@ urlpatterns = [
     path('success/', SuccessView.as_view(), name='success'),
     path('cancel/', CancelView.as_view(), name='cancel'),
     path('reservation_success/<int:reservation_id>/', reservation_success, name='reservation_success'),
+    path('cancel-subscription/', cancel_subscription, name='cancel_subscription'),
+    path('restaurants/<int:restaurant_id>/review/add/', add_review, name='add_review'),
+    path('reviews/<int:review_id>/edit/', edit_review, name='edit_review'),
+    path('reviews/<int:review_id>/delete/', delete_review, name='delete_review'),
+    path('password_reset/', auth_views.PasswordResetView.as_view(template_name='password_reset.html'), name='password_reset'),
+    path('password_reset_done/', auth_views.PasswordResetDoneView.as_view(template_name='password_reset_done.html'), name='password_reset_done'),
+    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='password_reset_confirm.html'), name='password_reset_confirm'),
+    path('reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='password_reset_complete.html'), name='password_reset_complete'),
 ]
 
 if settings.DEBUG:

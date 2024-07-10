@@ -4,7 +4,8 @@
 {% block title %}Nagoyameshi{% endblock %}
 
 {% block content %}
-<!--メインビジュアルを削除-->
+<!-- メインビジュアルは削除 -->
+
 
 <section class="container mt-4">
     <h2>レストラン一覧</h2>
@@ -32,8 +33,13 @@
             <div class="card">
                 <img src="{{ restaurant.img.url }}" class="card-img-top" alt="{{ restaurant.name }}">
                 <div class="card-body">
-                    <!-- リンクの装飾を削除し、色を継承するクラスを追加 -->
                     <h5 class="card-title"><a href="{% url 'restaurant_detail' restaurant.pk %}" class="text-decoration-none text-dark">{{ restaurant.name }}</a></h5>
+                    <!-- 平均評価を表示 -->
+                    {% if restaurant.avg_rating %}
+                    <div class="rating">
+                        平均評価: {{ restaurant.avg_rating }}
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -41,4 +47,3 @@
     </div>
 </section>
 {% endblock %}
-

@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}レビューを編集{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>レビューを編集</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="comment">コメント:</label>
+            <textarea id="comment" name="comment" class="form-control" required>{{ review.comment }}</textarea>
+        </div>
+        <div class="form-group">
+            <label>評価:</label>
+            <div class="rating-input">
+                <span class="fa fa-star" data-value="1"></span>
+                <span class="fa fa-star" data-value="2"></span>
+                <span class="fa fa-star" data-value="3"></span>
+                <span class="fa fa-star" data-value="4"></span>
+                <span class="fa fa-star" data-value="5"></span>
+            </div>
+            <input type="hidden" id="rating" name="rating" value="{{ review.rating }}" required>
+        </div>
+        <button type="submit" class="btn btn-primary">保存</button>
+    </form>
+</div>
+{% endblock %}
+
+<style>
+    .rating-input .fa-star {
+        font-size: 2rem;
+        color: gray;
+        cursor: pointer;
+    }
+    .rating-input .fa-star.checked {
+        color: gold;
+    }
+</style>
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var stars = document.querySelectorAll('.rating-input .fa-star');
+    var ratingInput = document.getElementById('rating');
+    var initialRating = ratingInput.value;
+
+    stars.forEach(function(star) {
+        if (star.getAttribute('data-value') <= initialRating) {
+            star.classList.add('checked');
+        }
+
+        star.addEventListener('click', function() {
+            var rating = this.getAttribute('data-value');
+            ratingInput.value = rating;
+
+            stars.forEach(function(star) {
+                if (star.getAttribute('data-value') <= rating) {
+                    star.classList.add('checked');
+                } else {
+                    star.classList.remove('checked');
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %}
