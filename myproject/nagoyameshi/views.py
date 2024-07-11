@@ -91,7 +91,7 @@ def signup(request):
             email=email,
             password=make_password(password1),
             is_end_user=True,
-            is_active=False
+            is_active=False #ユーザーを非有効化
         )
         user.save()
 
@@ -247,6 +247,7 @@ def edit_profile(request):
         return redirect('mypage')
     return render(request, 'edit_profile.html', {'user': user})
 
+
 # StripeのCheckoutセッション作成ビュー
 class CreateCheckoutSessionView(View):
     def post(self, request, *args, **kwargs):
@@ -259,25 +260,38 @@ class CreateCheckoutSessionView(View):
                         'price': 'price_1PYjlTRw1PAgyvNA5zi02qT7',  # 実際の価格IDに置き換えます
                         'quantity': 1,
                     },
-                ],
+                ],  
                 mode='subscription',
-                success_url=YOUR_DOMAIN + '/success/',
+                success_url=YOUR_DOMAIN + '/success/?session_id={CHECKOUT_SESSION_ID}',
                 cancel_url=YOUR_DOMAIN + '/cancel/',
             )
             return redirect(checkout_session.url)
         except Exception as e:
             print('Error creating checkout session:', e)
-            return JsonResponse({'error': str(e)}, status=500)
-        
-    
+            return JsonResponse({'error': str(e)}, status=500) 
+            
 # Stripe支払い成功時のビュー
 class SuccessView(View):
     def get(self, request, *args, **kwargs):
-        user = request.user
-        user.is_subscription_user = True
-        user.save()
-        return render(request, "success.html")
+        session_id = request.GET.get('session_id')
 
+        if session_id is None:
+            return HttpResponse("Session ID not found.", status=400)
+
+        try:
+            checkout_session = stripe.checkout.Session.retrieve(session_id)
+            subscription_id = checkout_session['subscription']
+
+            user = request.user
+            user.is_subscription_user = True
+            user.stripe_subscription_id = subscription_id
+            user.save()
+
+            return render(request, "success.html")
+        except Exception as e:
+            print(f"Error retrieving checkout session: {e}")
+            return HttpResponse("Error retrieving checkout session.", status=500)
+        
 # Stripe支払いキャンセル時のビュー
 class CancelView(View):
     def get(self, request, *args, **kwargs):
@@ -289,25 +303,28 @@ def logout_view(request):
     return redirect('login')
 
 # 解約機能の追加
-@login_required
 def cancel_subscription(request):
     user = request.user
     try:
-        # サブスクリプションIDを取得する（例: ユーザーモデルに保存されている場合）
+        # サブスクリプションIDを取得する（ユーザーモデルに保存されている場合）
         subscription_id = user.stripe_subscription_id
-        stripe.Subscription.delete(subscription_id)
-        
-        # ユーザーモデルのサブスクリプションステータスを更新
-        user.is_subscription_user = False
-        user.stripe_subscription_id = None
-        user.save()
-        
-        return redirect('mypage')
+        if subscription_id:
+            # サブスクリプションをキャンセル
+            stripe.Subscription.cancel(subscription_id)
+            
+            # ユーザーモデルのサブスクリプションステータスを更新
+            user.is_subscription_user = False
+            user.stripe_subscription_id = None  # サブスクリプションIDをクリア
+            user.save()
+            
+            return redirect('mypage')
+        else:
+            return HttpResponse("No subscription found.")
     except Exception as e:
         print(f"Error cancelling subscription: {e}")
         return HttpResponse("Error cancelling subscription. Please try again later.")
     
-   # レビュー投稿ビュー
+ # レビュー投稿ビュー
 @login_required
 def add_review(request, restaurant_id):
     restaurant = get_object_or_404(Restaurant, id=restaurant_id)
@@ -336,3 +353,16 @@ def delete_review(request, review_id):
     restaurant_id = review.restaurant.id
     review.delete()
     return redirect('restaurant_detail', pk=restaurant_id)
+
+# StripeのBilling Portalセッションを作成するビュー
+@login_required
+def create_billing_portal_session(request):
+    try:
+        session = stripe.billing_portal.Session.create(
+            customer=request.user.stripe_customer_id,
+            return_url="http://127.0.0.1:8000/mypage/",
+        )
+        return redirect(session.url)
+    except Exception as e:
+        print(f"Error creating billing portal session: {e}")
+        return HttpResponse("Error creating billing portal session. Please try again later.", status=500)

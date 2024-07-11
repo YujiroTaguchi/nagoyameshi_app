@@ -81,7 +81,6 @@ DATABASES = {
     }
 }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
@@ -147,3 +146,4 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 #Stripeの設定
 STRIPE_SECRET_KEY = 'sk_test_51PYLWqRw1PAgyvNA3WYaEPmhJvsrojWjZRnV2ssp63rWebEdPgwhWiGVPX8wa58B2bSM98wDevbtbled0TGtERba00fjIHiQtU'
 STRIPE_PUBLISHABLE_KEY = 'pk_test_51PYLWqRw1PAgyvNApvtQnoRICY932JeGE5PnImvbVbeMcdrCw3cLOCjdglouRANMpABqVZuFqV9w9415fIvdZOJE00wH1FOSky'
+

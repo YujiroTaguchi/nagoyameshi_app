@@ -26,6 +26,7 @@ from nagoyameshi.views import (
     reservation_success,
     cancel_subscription,
     add_review, edit_review, delete_review,
+    create_billing_portal_session,
 )
 
 urlpatterns = [
@@ -56,6 +57,7 @@ urlpatterns = [
     path('password_reset_done/', auth_views.PasswordResetDoneView.as_view(template_name='password_reset_done.html'), name='password_reset_done'),
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='password_reset_confirm.html'), name='password_reset_confirm'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='password_reset_complete.html'), name='password_reset_complete'),
+     path('billing-portal/', create_billing_portal_session, name='create_billing_portal_session'),
 ]
 
 if settings.DEBUG:

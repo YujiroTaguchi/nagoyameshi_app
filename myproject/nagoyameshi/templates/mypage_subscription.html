@@ -60,6 +60,9 @@
         </tbody>
     </table>
 
+    <!-- クレジットカード情報編集ボタン -->
+   <a href="{% url 'create_billing_portal_session' %}" class="btn btn-primary">クレジットカード情報を編集</a>
+
     <!-- 有料会員解約ボタン -->
     <form id="cancel-subscription-form" method="POST" action="{% url 'cancel_subscription' %}" class="mt-4">
         {% csrf_token %}

@@ -16,14 +16,14 @@ class RestaurantAdmin(admin.ModelAdmin):
 
 # カスタムユーザーモデルの管理画面登録
 class CustomUserAdmin(UserAdmin):
-    list_display = ('email', 'full_name', 'is_active', 'is_end_user', 'is_admin_user')
+    list_display = ('email', 'full_name', 'is_active', 'is_end_user', 'is_admin_user', 'is_subscription_user', 'stripe_subscription_id')
     search_fields = ('email', 'full_name')
     readonly_fields = ('date_joined', 'last_login')
 
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
         ('Personal info', {'fields': ('full_name', 'furigana', 'postal_code', 'address', 'phone_number', 'birthdate', 'occupation')}),
-        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
+        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'is_end_user', 'is_admin_user', 'is_subscription_user', 'stripe_subscription_id', 'groups', 'user_permissions')}),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
 
@@ -64,4 +64,3 @@ admin.site.register(Review, ReviewAdmin)
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Reservation, ReservationAdmin)  # ReservationAdminを登録
 admin.site.register(Favorite, FavoriteAdmin)
-
