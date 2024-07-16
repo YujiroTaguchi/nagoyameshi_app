@@ -19,6 +19,7 @@ import stripe
 from django.conf import settings
 from django.urls import reverse
 from django.db.models import Avg 
+from .decorators import subscription_required  # カスタムデコレータをインポート
 
 # StripeのAPIキーを設定
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -146,6 +147,7 @@ def login_view(request):
 
 # 予約作成ビュー
 @login_required
+@subscription_required
 @csrf_protect
 def make_reservation(request, restaurant_id):
     restaurant = get_object_or_404(Restaurant, pk=restaurant_id)
@@ -180,6 +182,7 @@ def make_reservation(request, restaurant_id):
     return render(request, 'make_reservation.html', {'restaurant': restaurant})
 
 @login_required
+@subscription_required
 def reservation_success(request, reservation_id):
     reservation = get_object_or_404(Reservation, pk=reservation_id)
     return render(request, 'reservation_success.html', {'reservation': reservation})
@@ -187,12 +190,14 @@ def reservation_success(request, reservation_id):
 
 # 予約リストビュー
 @login_required
+@subscription_required
 def reservation_list(request):
     reservations = Reservation.objects.filter(user=request.user)
     return render(request, 'reservation_list.html', {'reservations': reservations})
 
 # 予約キャンセルビュー
 @login_required
+@subscription_required
 def cancel_reservation(request, reservation_id):
     reservation = Reservation.objects.get(pk=reservation_id)
     if reservation.user == request.user:
@@ -201,6 +206,7 @@ def cancel_reservation(request, reservation_id):
 
 # お気に入り追加ビュー
 @login_required
+@subscription_required
 def add_to_favorites(request, restaurant_id):
     restaurant = get_object_or_404(Restaurant, id=restaurant_id)
     Favorite.objects.get_or_create(user=request.user, restaurant=restaurant)
@@ -208,6 +214,7 @@ def add_to_favorites(request, restaurant_id):
 
 # お気に入り解除ビュー
 @login_required
+@subscription_required
 def remove_from_favorites(request, favorite_id):
     favorite = get_object_or_404(Favorite, id=favorite_id, user=request.user)
     favorite.delete()
@@ -215,6 +222,7 @@ def remove_from_favorites(request, favorite_id):
 
 # お気に入り一覧ビュー
 @login_required
+@subscription_required
 def favorite_list(request):
     favorites = Favorite.objects.filter(user=request.user).select_related('restaurant')
     return render(request, 'favorite_list.html', {'favorites': favorites})
@@ -228,8 +236,7 @@ def mypage(request):
         favorites = Favorite.objects.filter(user=user)
         return render(request, 'mypage_subscription.html', {'user': user, 'reservations': reservations, 'favorites': favorites})
     else:
-        return render(request, 'mypage_free.html', {'user': user, 'stripe_public_key': settings.STRIPE_PUBLISHABLE_KEY})
-
+        return render(request, 'mypage_free.html', {'user': user})
 # ユーザー情報編集ビュー
 @login_required
 @csrf_protect
@@ -284,6 +291,7 @@ class SuccessView(View):
 
             user = request.user
             user.is_subscription_user = True
+            user.stripe_customer_id = checkout_session['customer']
             user.stripe_subscription_id = subscription_id
             user.save()
 
@@ -326,6 +334,7 @@ def cancel_subscription(request):
     
  # レビュー投稿ビュー
 @login_required
+@subscription_required
 def add_review(request, restaurant_id):
     restaurant = get_object_or_404(Restaurant, id=restaurant_id)
     if request.method == 'POST':
@@ -337,6 +346,7 @@ def add_review(request, restaurant_id):
 
 # レビュ編集ュー
 @login_required
+@subscription_required
 def edit_review(request, review_id):
     review = get_object_or_404(Review, id=review_id, user=request.user)
     if request.method == 'POST':
@@ -348,6 +358,7 @@ def edit_review(request, review_id):
 
 # レビュー削除ビュー
 @login_required
+@subscription_required
 def delete_review(request, review_id):
     review = get_object_or_404(Review, id=review_id, user=request.user)
     restaurant_id = review.restaurant.id
@@ -366,3 +377,7 @@ def create_billing_portal_session(request):
     except Exception as e:
         print(f"Error creating billing portal session: {e}")
         return HttpResponse("Error creating billing portal session. Please try again later.", status=500)
+    
+#エラーページビューの追加
+def subscription_required_view(request):
+    return render(request, 'subscription_required.html')

@@ -1,0 +1,15 @@
+<!-- subscription_required.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>有料会員登録が必要です</title>
+</head>
+<body>
+    <h1>この機能を利用するには有料会員登録が必要です</h1>
+    <p>有料会員登録を行うことで、予約、レビュー投稿、お気に入り追加が利用可能になります。</p>
+    <form method="post" action="{% url 'create_checkout_session' %}">
+        {% csrf_token %}
+        <button type="submit">こちらから有料会員登録してください</button>
+    </form>
+</body>
+</html>

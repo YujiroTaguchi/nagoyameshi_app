@@ -74,10 +74,15 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+import os
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.getenv('NAME'),
+        'USER' : os.getenv('USER'),
+        'PASSWORD':os.getenv('PASSWORD'),
+        'HOST' : os.getenv('HOST'),
     }
 }
 
@@ -140,10 +145,15 @@ LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'login'
 
-#メールエラーへの対処
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+#メール送付
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'nagoyameshiyt@gmail.com'
+EMAIL_HOST_PASSWORD = 'sqzcisicuvwupwol'
 
 #Stripeの設定
-STRIPE_SECRET_KEY = 'sk_test_51PYLWqRw1PAgyvNA3WYaEPmhJvsrojWjZRnV2ssp63rWebEdPgwhWiGVPX8wa58B2bSM98wDevbtbled0TGtERba00fjIHiQtU'
-STRIPE_PUBLISHABLE_KEY = 'pk_test_51PYLWqRw1PAgyvNApvtQnoRICY932JeGE5PnImvbVbeMcdrCw3cLOCjdglouRANMpABqVZuFqV9w9415fIvdZOJE00wH1FOSky'
+STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
+STRIPE_PUBLISHABLE_KEY = os.getenv('STRIPE_PUBLISHABLE_KEY')
 

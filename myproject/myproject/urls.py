@@ -27,6 +27,7 @@ from nagoyameshi.views import (
     cancel_subscription,
     add_review, edit_review, delete_review,
     create_billing_portal_session,
+    subscription_required_view,
 )
 
 urlpatterns = [
@@ -45,7 +46,7 @@ urlpatterns = [
     path('favorites/', favorite_list, name='favorite_list'),
     path('mypage/', mypage, name='mypage'),
     path('edit_profile/', edit_profile, name='edit_profile'),
-    path('create-checkout-session/', CreateCheckoutSessionView.as_view(), name='create-checkout-session'),
+    path('create-checkout-session/', CreateCheckoutSessionView.as_view(), name='create_checkout_session'), 
     path('success/', SuccessView.as_view(), name='success'),
     path('cancel/', CancelView.as_view(), name='cancel'),
     path('reservation_success/<int:reservation_id>/', reservation_success, name='reservation_success'),
@@ -57,7 +58,8 @@ urlpatterns = [
     path('password_reset_done/', auth_views.PasswordResetDoneView.as_view(template_name='password_reset_done.html'), name='password_reset_done'),
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='password_reset_confirm.html'), name='password_reset_confirm'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='password_reset_complete.html'), name='password_reset_complete'),
-     path('billing-portal/', create_billing_portal_session, name='create_billing_portal_session'),
+    path('billing-portal/', create_billing_portal_session, name='create_billing_portal_session'),
+    path('subscription-required/', subscription_required_view, name='subscription_required'),  # エラーページのURLパターン
 ]
 
 if settings.DEBUG:

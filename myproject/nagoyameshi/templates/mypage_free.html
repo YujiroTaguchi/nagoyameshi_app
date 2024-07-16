@@ -9,13 +9,15 @@
         <!-- 会員情報編集ボタン -->
         <a href="{% url 'edit_profile' %}" class="list-group-item list-group-item-action">会員情報編集</a>
         <!-- 有料会員登録ボタン -->
-        <form id="checkout-form" method="POST" action="{% url 'create-checkout-session' %}" class="list-group-item">
+        <form id="checkout-form" method="POST" action="{% url 'create_checkout_session' %}" class="list-group-item">
             {% csrf_token %}
             <button type="submit" id="checkout-button" name="checkout-button" class="btn btn-primary">有料会員登録</button>
         </form>
         <!-- ログアウトボタン -->
-        <a href="{% url 'logout' %}" class="list-group-item list-group-item-action">ログアウト</a>
-    </div>
+        <a href="#" class="list-group-item list-group-item-action" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">ログアウト</a>
+        <form id="logout-form" method="post" action="{% url 'logout' %}" style="display: none;">
+            {% csrf_token %}
+        </form>
 </div>
 {% endblock %}
 
