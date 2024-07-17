@@ -74,6 +74,7 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+import django_heroku
 from dotenv import load_dotenv
 load_dotenv()
 import os
@@ -159,3 +160,5 @@ EMAIL_HOST_PASSWORD = 'sqzcisicuvwupwol'
 STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
 STRIPE_PUBLISHABLE_KEY = os.getenv('STRIPE_PUBLISHABLE_KEY')
 
+# Activate Django-Heroku.
+django_heroku.settings(locals())

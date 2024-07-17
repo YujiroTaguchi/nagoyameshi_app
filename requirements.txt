@@ -2,3 +2,4 @@ django
 pillow
 stripe
 mysqlclient
+django-heroku
