@@ -11,10 +11,13 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import dj_database_url  # この行を追加
+import django_heroku
+from dotenv import load_dotenv
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -37,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'nagoyameshi' #なごやめしアプリの連携
+    'nagoyameshi'  # なごやめしアプリの連携
 ]
 
 MIDDLEWARE = [
@@ -70,21 +73,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'myproject.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-import django_heroku
-from dotenv import load_dotenv
 load_dotenv()
-import os
 
 DATABASES = {
     'default': dj_database_url.config(
         default=os.getenv('DATABASE_URL')
     )
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -104,7 +102,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
@@ -115,7 +112,6 @@ TIME_ZONE = 'Asia/Tokyo'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
@@ -129,25 +125,25 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-#店舗画像関連の設定
+# 店舗画像関連の設定
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-#静的ファイル（画像含む）の設定
+# 静的ファイル（画像含む）の設定
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / "nagoyameshi/static",
 ]
 
-#カスタムユーザーモデルを指定
-AUTH_USER_MODEL = 'nagoyameshi.CustomUser' 
+# カスタムユーザーモデルを指定
+AUTH_USER_MODEL = 'nagoyameshi.CustomUser'
 
-#ログインの設定
+# ログインの設定
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'login'
 
-#メール送付
+# メール送付
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
@@ -155,7 +151,7 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'nagoyameshiyt@gmail.com'
 EMAIL_HOST_PASSWORD = 'sqzcisicuvwupwol'
 
-#Stripeの設定
+# Stripeの設定
 STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
 STRIPE_PUBLISHABLE_KEY = os.getenv('STRIPE_PUBLISHABLE_KEY')
 
