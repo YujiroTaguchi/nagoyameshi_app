@@ -80,15 +80,11 @@ load_dotenv()
 import os
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('NAME'),
-        'USER' : os.getenv('USER'),
-        'PASSWORD':os.getenv('PASSWORD'),
-        'HOST' : os.getenv('HOST'),
-         'PORT': os.getenv('PORT', '3306'), 
-    }
+    'default': dj_database_url.config(
+        default=os.getenv('DATABASE_URL')
+    )
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
